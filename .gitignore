@@ -42,3 +42,4 @@ yarn-error.log*
 *.json
 *.sqlite
 
+*.node_modules
