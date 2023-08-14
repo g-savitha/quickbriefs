@@ -7,15 +7,11 @@ WORKDIR /app
 # Add the current directory contents into the container at /app
 ADD . /app
 
-# Declare any environment variables
-ARG RAILWAY_ENVIRONMENT
-ENV RAILWAY_ENVIRONMENT=$RAILWAY_ENVIRONMENT
-
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Make port 3000 available to the world outside this container
-EXPOSE 3000
+# Make port 80 available to the world outside this container
+EXPOSE 80
 
 # Run the command to start uvicorn
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "3000"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
