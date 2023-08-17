@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 class Url(BaseModel):
     url: str
-    available_time: float
+    summary_percentage: float
 
 
 app = FastAPI()
@@ -37,7 +37,8 @@ async def scrape(url: Url):
     summary_endpoint = "http://text_summarization_service:8081/summarize/"
     summary_response = requests.post(
         summary_endpoint,
-        json={"content": scraped_content, "available_time": url.available_time}
+        json={"content": scraped_content,
+              "summary_percentage": url.summary_percentage}
     )
 
     # Check the status code of the summary_response and return its JSON content

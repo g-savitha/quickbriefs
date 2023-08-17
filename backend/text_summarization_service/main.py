@@ -12,23 +12,30 @@ tokenizer = BartTokenizer.from_pretrained(model_name)
 
 class Item(BaseModel):
     content: str
-    available_time: float  # time in minutes
+    summary_percentage: float  # e.g., 0.2 for 20%
 
 
 @app.post("/summarize/")
 async def summarize_content(item: Item):
-    # Estimate reading speed
-    average_words_per_minute = 225
-    max_words = int(item.available_time * average_words_per_minute)
-
-    # Convert to max tokens (assuming an average of 1.5 tokens per word for safety)
-    max_tokens = int(1.5 * max_words)
-
-    # Tokenize the content and generate summary IDs
+    # Tokenize the content
     inputs = tokenizer([item.content], max_length=1024,
                        return_tensors='pt', truncation=True)
+
+    # Calculate desired length based on percentage
+    desired_length = int(item.summary_percentage / 100 *
+                         len(inputs['input_ids'][0]))
+    min_gen_length = max(30, int(0.8 * desired_length))
+    max_gen_length = int(1.2 * desired_length)
+
+    # Generate summary IDs with adjusted parameters
     summary_ids = model.generate(
-        inputs['input_ids'], num_beams=4, min_length=30, max_length=max_tokens, early_stopping=True)
+        inputs['input_ids'],
+        num_beams=6,
+        min_length=min_gen_length,
+        max_length=max_gen_length,
+        early_stopping=True,
+        length_penalty=0.8
+    )
 
     # Decode the summary IDs and return the summary
     summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
