@@ -9,7 +9,7 @@ ADD . /app
 
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
-
-
+# Here, we default to 8080 but it can be overridden by the service that runs the container.
+ENV PORT=8080
 # Run the command to start uvicorn
 CMD uvicorn main:app --host 0.0.0.0 --port $PORT
