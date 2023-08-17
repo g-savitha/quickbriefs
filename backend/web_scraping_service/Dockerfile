@@ -10,8 +10,6 @@ ADD . /app
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Make port 3000 available to the world outside this container
-EXPOSE 3000
 
 # Run the command to start uvicorn
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "3000"]
+CMD uvicorn main:app --host 0.0.0.0 --port $PORT
