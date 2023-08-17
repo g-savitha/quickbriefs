@@ -1,0 +1,15 @@
+version: '3'
+services:
+  web_scraping_service:
+    build:
+      context: ./backend/web_scraping_service
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+
+  text_summarization_service:
+    build:
+      context: ./backend/text_summarization_service
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"

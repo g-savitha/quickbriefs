@@ -7,6 +7,7 @@ from pydantic import BaseModel
 
 class Url(BaseModel):
     url: str
+    available_time: float
 
 
 app = FastAPI()
@@ -26,15 +27,27 @@ def scrape_webpage(url: str):
     return ' '.join(text_content)
 
 
-@app.exception_handler(Exception)
-async def general_exception_handler(request, exc):
-    return JSONResponse(status_code=500, content={"message": "An unexpected error occurred."})
-
-
 @app.post("/scrape/", response_class=JSONResponse)
 async def scrape(url: Url):
-    content = scrape_webpage(url.url)
-    if not content:
+    scraped_content = scrape_webpage(url.url)
+    if not scraped_content:
         raise HTTPException(
             status_code=404, detail="Webpage content not found")
-    return {"text": content}
+
+    summary_endpoint = "http://text_summarization_service:8081/summarize/"
+    summary_response = requests.post(
+        summary_endpoint,
+        json={"content": scraped_content, "available_time": url.available_time}
+    )
+
+    # Check the status code of the summary_response and return its JSON content
+    if summary_response.status_code == 200:
+        return summary_response.json()
+    else:
+        raise HTTPException(
+            status_code=500, detail="Summarization service failed")
+
+
+# @app.exception_handler(Exception)
+# async def general_exception_handler(request, exc):
+#     return JSONResponse(status_code=500, content={"message": "An unexpected error occurred."})
