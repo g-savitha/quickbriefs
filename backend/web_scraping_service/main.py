@@ -5,8 +5,10 @@ import requests
 from pydantic import BaseModel
 import os
 
+# environment variable to test between local and prod.
+# Railway doesnt support docker compose. so push each service individually.
 SUMMARIZATION_SERVICE_URL = os.environ.get(
-    "SUMMARIZATION_SERVICE_URL", "http://text_summarization_service.railway.internal:8081/summarize/")
+    "SUMMARIZATION_SERVICE_URL", "http://text_summarization_service.railway.internal/summarize/")
 
 
 class Url(BaseModel):
