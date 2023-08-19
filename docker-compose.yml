@@ -8,6 +8,8 @@ services:
       - "8080:8080"
     depends_on:
       - text_summarization_service
+    environment:
+    - SUMMARIZATION_SERVICE_URL=http://text_summarization_service:8081/summarize/
 
   text_summarization_service:
     build:

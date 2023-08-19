@@ -3,6 +3,10 @@ from fastapi.responses import JSONResponse
 from bs4 import BeautifulSoup
 import requests
 from pydantic import BaseModel
+import os
+
+SUMMARIZATION_SERVICE_URL = os.environ.get(
+    "SUMMARIZATION_SERVICE_URL", "http://localhost:8081/summarize/")
 
 
 class Url(BaseModel):
@@ -34,7 +38,7 @@ async def scrape(url: Url):
         raise HTTPException(
             status_code=404, detail="Webpage content not found")
 
-    summary_endpoint = "http://text_summarization_service:8081/summarize/"
+    summary_endpoint = SUMMARIZATION_SERVICE_URL
     summary_response = requests.post(
         summary_endpoint,
         json={"content": scraped_content,

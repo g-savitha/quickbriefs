@@ -24,9 +24,15 @@ async def summarize_content(item: Item):
     # Calculate desired length based on percentage
     desired_length = int(item.summary_percentage / 100 *
                          len(inputs['input_ids'][0]))
+    if desired_length < 30:  # Ensure we have a reasonable minimum
+        desired_length = 30
+
     min_gen_length = max(30, int(0.8 * desired_length))
     max_gen_length = int(1.2 * desired_length)
 
+    # Ensure max_gen_length is never less than min_gen_length
+    if max_gen_length < min_gen_length:
+        max_gen_length = min_gen_length + 5  # Add a buffer
     # Generate summary IDs with adjusted parameters
     summary_ids = model.generate(
         inputs['input_ids'],
