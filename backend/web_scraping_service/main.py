@@ -6,7 +6,7 @@ from pydantic import BaseModel
 import os
 
 SUMMARIZATION_SERVICE_URL = os.environ.get(
-    "SUMMARIZATION_SERVICE_URL", "http://localhost:8081/summarize/")
+    "SUMMARIZATION_SERVICE_URL", "http://text_summarization_service.railway.internal:8081/summarize/")
 
 
 class Url(BaseModel):
