@@ -44,3 +44,4 @@ yarn-error.log*
 *.sqlite
 
 *.node_modules
+backend/text_summarization_service/config.py

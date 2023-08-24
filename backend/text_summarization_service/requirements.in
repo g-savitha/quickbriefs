@@ -1,6 +1,5 @@
 fastapi
 pydantic
-transformers
-torch
 uvicorn
+openai
 

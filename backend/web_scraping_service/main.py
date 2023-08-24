@@ -8,12 +8,12 @@ import os
 # environment variable to test between local and prod.
 # Railway doesnt support docker compose. so push each service individually.
 SUMMARIZATION_SERVICE_URL = os.environ.get(
-    "SUMMARIZATION_SERVICE_URL", "http://text_summarization_service.railway.internal/summarize/")
+    "SUMMARIZATION_SERVICE_URL", "http://localhost:8081/summarize/")
 
 
 class Url(BaseModel):
     url: str
-    summary_percentage: float
+    desired_length: str  # Values can be: 'short', 'medium', 'long'
 
 
 app = FastAPI()
@@ -29,8 +29,16 @@ def scrape_webpage(url: str):
 
     webpage_content = response.text
     soup = BeautifulSoup(webpage_content, 'html.parser')
+    # # Replace code blocks with placeholder text
+    # for code_block in soup.find_all('pre'):
+    #     code_block.replace_with("[code block]")
+    # clean the scraped content by removing extra whitespaces and newlines
     text_content = [p.text for p in soup.find_all('p')]
-    return ' '.join(text_content)
+    cleaned_content = ' '.join(
+        ' '.join(text_content).split())  # Clean the content
+    print("--------------------------------------------------")
+    print(cleaned_content)
+    return cleaned_content
 
 
 @app.post("/scrape/", response_class=JSONResponse)
@@ -40,11 +48,28 @@ async def scrape(url: Url):
         raise HTTPException(
             status_code=404, detail="Webpage content not found")
 
+    # Check content length and adjust summary_length if needed
+    content_length = len(scraped_content.split())
+    print("************************************************************")
+    print(content_length)
+
+    if content_length < 500:  # Arbitrary number, adjust as needed
+        summary_length = 'short'
+    elif content_length < 750:  # Another arbitrary number
+        if url.desired_length == 'long':
+            summary_length = 'medium'
+        else:
+            summary_length = url.desired_length
+    else:
+        summary_length = url.desired_length
+
     summary_endpoint = SUMMARIZATION_SERVICE_URL
     summary_response = requests.post(
         summary_endpoint,
-        json={"content": scraped_content,
-              "summary_percentage": url.summary_percentage}
+        json={
+            "content": scraped_content,
+            "summary_length": summary_length
+        }
     )
 
     # Check the status code of the summary_response and return its JSON content

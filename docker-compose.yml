@@ -17,3 +17,5 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8081:8081"
+    environment:
+    - OPEN_AI_KEY=CHECK_CONFIG_PY
